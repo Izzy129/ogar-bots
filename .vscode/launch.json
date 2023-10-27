@@ -6,44 +6,17 @@
     "configurations": [
         {
             "type": "java",
-            "name": "BotClient",
-            "request": "launch",
-            "mainClass": "OgarBots.BotClient",
-            "projectName": "demo"
-        },
-        {
-            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
         },
         {
-            "type": "java",
-            "name": "Launch Chat Client",
-            "request": "launch",
-            "mainClass": "Chat.ChatClient",
-            "projectName": "demo"
-        },
-        {
-            "type": "java",
-            "name": "Launch Chat Server",
-            "request": "launch",
-            "mainClass": "Chat.ChatServer",
-            "projectName": "demo"
-        },
-        {
             "type":"java",
-            "name":"start bot",
+            "name":"start bots",
             "request":"launch",
             "mainClass":"OgarBots.App",
             "projectName":"demo"
         },
-        {
-            "type": "java",
-            "name": "Client",
-            "request": "launch",
-            "mainClass": "com.example.Client",
-            "projectName": "demo"
-        }
+        
     ]
 }
