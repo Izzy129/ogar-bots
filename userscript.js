@@ -24,7 +24,7 @@ console.log("ogarbot script loaded");
             origin: null
         };
         document.addEventListener('keydown', function (e) {
-            var key = e.keyCode || e.which;
+            var key = e.keyCode || e.which; // deprecated, look into replacement
             switch (key) {
                 case 69:
                     socket.emit('split');
@@ -35,8 +35,9 @@ console.log("ogarbot script loaded");
                     console.log("eject press");
                     break;
                 case 67:
-                    socket.emit('spam');
-                    console.log("spam press");
+                    var msg = prompt("What do you want to spam?", "I'm not a bot");
+                    socket.emit('spam', msg);
+                    console.log("spam press with message: " + msg);
                     break;
             }
         });
@@ -53,19 +54,19 @@ console.log("ogarbot script loaded");
                 if (data instanceof ArrayBuffer) data = new DataView(data); // fixes "first parse cannot be arraybuffer"
                 else if (data instanceof DataView) data = data; // provided data is correct
                 else data = new DataView(data.buffer); // converts to arraybuffer 
-                if (data.byteLength === 21) { // cellcraft protocol? 
+                if (data.byteLength === 21) { // 64 bit, newer protocol?
                     if (data.getInt8(0, true) === 16) {
                         window.user.x = data.getFloat64(1, true);
                         window.user.y = data.getFloat64(9, true);
                     }
                 }
-                if (data.byteLength === 13) { // multi ogar edited protocol
+                if (data.byteLength === 13) { // 32 bit, multogar protocol
                     if (data.getUint8(0, true) === 16) {
                         window.user.x = data.getInt32(1, true);
                         window.user.y = data.getInt32(5, true);
                     }
                 }
-                if (data.byteLength === 5 || data.byteLength < 4) { // really old protocol
+                if (data.byteLength === 5 || data.byteLength < 4) { // 16 bit, old protocol
                     if (data.getUint8(0, true) === 16) {
                         window.user.x = data.getInt16(1, true);
                         window.user.y = data.getInt16(3, true);

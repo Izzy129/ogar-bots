@@ -5,15 +5,33 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class App {
-    public static String targetIp = "127.0.0.1"; // grab from userscript later
-    public static int targetPort = 443; // grab from userscript later
+    public static String targetIp = ""; // from userscript
+    public static String origin = ""; // from userscript
     
-    public static int botCount = 25;
+
+    public static int botCount = 40;
     public static int connectTimeout = 500;
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws URISyntaxException, InterruptedException {
+        System.out.println("Welcome to OgarBots");
+        Server.start();
+    }
+    public static String getHost(String ip) throws URISyntaxException {
+
+        Pattern pattern = Pattern.compile("ws:\\/\\/([^:]+)");
+        Matcher matcher = pattern.matcher(ip);
         
+        if (matcher.find()) {
+            System.out.println(matcher.group(1));
+            return matcher.group(1);
+        } else {
+            return "localhost";
+        }
+    }
+    public static void startBots() throws InterruptedException, URISyntaxException {
         Map<String, String> httpHeaders = new HashMap<String, String>();
         // fake headers to make server think a browser is connecting
         httpHeaders.put("User-Agent", "ImNotABot");
@@ -23,15 +41,15 @@ public class App {
 		httpHeaders.put("Connection", "Upgrade");
 		httpHeaders.put("Sec-WebSocket-Version", "13");
 		httpHeaders.put("Pragma", "no-cache");
-        httpHeaders.put("Host", "localhost:3000"); // grab from userscript later
+        httpHeaders.put("Host", getHost(targetIp)); // grab from userscript later 
 		httpHeaders.put("Connection", "Upgrade");
-        httpHeaders.put("Origin", "localhost:3000"); // grab from userscript later
+        httpHeaders.put("Origin", origin); // from userscript
 		httpHeaders.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
 
         ArrayList<BotClient> bots = new ArrayList<BotClient>();
         
         for (int i = 0; i < botCount; i++) {
-            BotClient c = new BotClient(new URI("ws://" + targetIp + ":" + targetPort), httpHeaders);
+            BotClient c = new BotClient(new URI(targetIp), httpHeaders);
             bots.add(c);
             c.connect();
             
@@ -42,8 +60,6 @@ public class App {
                 e.printStackTrace();
             }
         }
-
-
     }
     
 }
