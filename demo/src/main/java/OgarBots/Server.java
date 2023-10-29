@@ -1,15 +1,11 @@
 package OgarBots;
 
-import java.util.Scanner;
-
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
-
-import javafx.scene.chart.PieChart.Data;
 
 public class Server { // this file is for user info from userscript
 
@@ -31,7 +27,6 @@ public class Server { // this file is for user info from userscript
         });
 
         server.addEventListener("start", ConnectPacket.class, new DataListener<ConnectPacket>() {
-
             @Override
             public void onData(SocketIOClient client, ConnectPacket packet, AckRequest ackSender) throws Exception {
                 String ip = packet.getIp();
@@ -45,12 +40,28 @@ public class Server { // this file is for user info from userscript
                 System.out.println("[Server] Bots started!");
             }
         });
-
         
-        // add on start listener
-        // server.addEventListener("spam", null, null);
-        // userscript will send a message to this server when it starts
-        // finish this later 
+        server.addEventListener("movement", MovementPacket.class, new DataListener<MovementPacket>() {
+            @Override
+            public void onData(SocketIOClient client, MovementPacket data, AckRequest ackSender) throws Exception {
+                int x = data.getX();
+                int y = data.getY();
+                App.moveBots(x, y);
+            }
+        });
+        server.addEventListener("eject", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
+                App.ejectBots();
+            }
+        });
+        server.addEventListener("split", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
+                App.splitBots();
+            }
+        });
+ 
         server.start();
         System.out.println("[Server] Socket.IO Server started at port " + config.getPort() + "!");
         System.out.println();

@@ -48,12 +48,10 @@ console.log("ogarbot script loaded");
             this.send = function (data) {
                 this._send(data);
                 if (typeof data == 'string') return; // invalid data can cause crash
-                //if (this.url.includes('localhost')) return; // idk if we need this
-                
-
                 if (data instanceof ArrayBuffer) data = new DataView(data); // fixes "first parse cannot be arraybuffer"
                 else if (data instanceof DataView) data = data; // provided data is correct
-                else data = new DataView(data.buffer); // converts to arraybuffer 
+                else data = new DataView(data.buffer); // converts to arraybuffer
+
                 if (data.byteLength === 21) { // 64 bit, newer protocol?
                     if (data.getInt8(0, true) === 16) {
                         window.user.x = data.getFloat64(1, true);
@@ -74,12 +72,11 @@ console.log("ogarbot script loaded");
                 }
                 if (this.url !== null) {
                     window.user.ip = this.url;
-                    console.log(window.user.ip);
                 }
                 window.user.origin = location.origin;
             }
         }
-      
+
         var socket = io.connect('ws://localhost:8080');
 
         setInterval(function () {
@@ -87,18 +84,19 @@ console.log("ogarbot script loaded");
                 x: window.user.x,
                 y: window.user.y,
             });
+            $('#mouseGuiX').html(window.user.x);
+            $('#mouseGuiY').html(window.user.y);
         }, 100);
-        setInterval(function () {
-            console.log("x: " + window.user.x + " y: " + window.user.y);
-        }, 100);
+
         window.start = function () {
             socket.emit('start', {
                 ip: window.user.ip !== null ? window.user.ip : 0,
                 origin: location.origin
             });
+            console.log("start bots packet sent");
         };
         setTimeout(function () { //<div style='box-shadow: 0px 0px 20px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 205px; top: 300px; left: 10px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;border: 2px solid #0c31d4;'> <div style='color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1;font-size: 22px; filter:alpha(opacity=100); padding: 10px;'><a>Trap Client</a></div> <div style=' color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1; filter:alpha(opacity=100); padding: 10px;'><br>Minions: <a id='minionCount'>Offline</a> </div><button id='start-bots' style='display: block;border-radius: 5px;border: 2px solid #6495ED;background-color: #BCD2EE;height: 50px;width: 120px;margin: auto;text-align: center;'>StartBots </button><marquee>TrapKillo - Owner</marquee> </div>
-            $("#canvas").after("<div  id = 'gui' style='box-shadow: 0px 0px 20px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 205px; top: 300px; left: 10px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;border: 2px solid #0c31d4; border-radius: 15px 50px;'> <div style='color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1;font-size: 22px; filter:alpha(opacity=100); padding: 10px;'><a id='Client_Name'>Agar infinity</a></div> <div style=' color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1; filter:alpha(opacity=100); padding: 10px;'><br>Minions: <a id='minionCount'>Offline</a> </div><button id='start-bots' style='display: block;border-radius: 5px;border: 2px solid #6495ED;background-color: #BCD2EE;height: 50px;width: 120px;margin: auto;text-align: center;'>StartBots </button></div>");
+            $("#canvas").after("<div  id = 'gui' style='box-shadow: 0px 0px 20px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 205px; top: 300px; left: 10px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;border: 2px solid #0c31d4; border-radius: 15px 50px;'> <div style='color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1;font-size: 22px; filter:alpha(opacity=100); padding: 10px;'><a id='Client_Name'>Agar infinity</a></div> <div style=' color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1; filter:alpha(opacity=100); padding: 10px;'><br>Minions: <a id='minionCount'>Offline</a> <br>X: <a id='mouseGuiX'>0</a> Y: <a id='mouseGuiY'>0</a></div></div> <button id='start-bots' style='display: block;border-radius: 5px;border: 2px solid #6495ED;background-color: #BCD2EE;height: 50px;width: 120px;margin: auto;text-align: center;'>StartBots </button></div>");
             document.getElementById('start-bots').onclick = function () {
                 window.start();
             };
@@ -161,7 +159,7 @@ setTimeout(function () {
     setInterval(function () {
         change();
     }, speed);
-}, 3000);
+}, 5000);
 setTimeout(function () {
     $(function () {
         $("#gui").draggable();

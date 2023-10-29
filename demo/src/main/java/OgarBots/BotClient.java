@@ -12,25 +12,18 @@ import org.java_websocket.handshake.ServerHandshake;
 public class BotClient extends WebSocketClient {
 	public static int botAmount = 0;
 	public final int botId;
-	public int splitTimeout = 100;
-	public int ejectTimeout = 100;
-	public Map<String, String> httpHeaders = new HashMap<String, String>();
-	// public BotClient(URI serverUri, Draft draft) {
-	// 	super(serverUri, draft);
-	// }
 
-	// public BotClient(URI serverURI) {
-	// 	super(serverURI);
-	// }
+	public Map<String, String> httpHeaders = new HashMap<String, String>();
 
 	public BotClient(URI serverURI, Map<String, String> httpHeaders) {
 		super(serverURI, httpHeaders);
 		botId = ++botAmount;
 	}
+
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
 		System.out.println("Bot " + botId + " connected");
-		// System.out.println(handshakedata.getHttpStatusMessage());
+
 		// got these from badplayer55's onCellcraft
 		send(new byte[] {
 				(byte) 254, 5, 0, 0, 0
@@ -46,16 +39,13 @@ public class BotClient extends WebSocketClient {
 		// send spawn request
 		sendPlay("1234"); // name dont work, just sends chinese character
 
-		sendMouse(-3400, -1000); 
-		
 	}
 
 	public void sendSplit() {
 		try {
 			send(new byte[] {
-					(byte) 17 // opcode from cigar 
+					(byte) 17 // opcode from cigar
 			});
-			Thread.sleep(splitTimeout);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -64,9 +54,8 @@ public class BotClient extends WebSocketClient {
 	public void sendEject() {
 		try {
 			send(new byte[] {
-					(byte) 21 // opcode from cigar 
+					(byte) 21 // opcode from cigar
 			});
-			Thread.sleep(ejectTimeout);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -93,19 +82,9 @@ public class BotClient extends WebSocketClient {
 		System.out.println("received message: " + message);
 	}
 
-	// @Override
-	// public void onMessage(ByteBuffer message) {
-	// 	// System.out.println("received ByteBuffer");
-	// 	// try {
-	// 	// // System.out.write(message.array());
-	// 	// } catch (IOException e) {
-	// 	// // TODO Auto-generated catch block
-	// 	// e.printStackTrace();
-	// 	// }
-	// }
-
 	public void sendPlay(String name) {
-		// sooo apparently cigar unescapes this using encodeURIComponent, idk if you can do this in java
+		// sooo apparently cigar unescapes this using encodeURIComponent, idk if you can
+		// do this in java
 		// also has their own method of setting strings or something, refer to
 		// setStringUTF8();
 		// in cigar's binaryWriter.js
@@ -119,15 +98,16 @@ public class BotClient extends WebSocketClient {
 		buffer.flip();
 		send(buffer);
 	}
+
 	public void sendMouse(int x, int y) { // WORKS NOW YAY
-		
+
 		ByteBuffer buffer = ByteBuffer.allocate(13); // allocate 13 bytes for mouse packet
 		buffer.order(ByteOrder.LITTLE_ENDIAN); // cigar uses this for mouse packets, so I will too :troll:
-		buffer.put(0, (byte) 16); // first byte used for something 
+		buffer.put(0, (byte) 16); // first byte used for something
 		buffer.putInt(1, x); // putInt() puts 4 bytes, so we need to put 4 bytes at a time
 		buffer.putInt(5, y); // last putInt() used 4 bytes, so start now at 5
 		buffer.putInt(9, 0);
-		
+
 		send(buffer.array());
 	}
 
