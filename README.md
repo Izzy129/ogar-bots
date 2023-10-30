@@ -16,9 +16,15 @@ Only uploading here for coding on laptop
 - [x] Bots connecting to the server
 - [x] WebSocket message handling
 - [x] Spawn packet
-- [ ] Name packet 
 - [x] Split/Eject packet
-- [x] Bot movement
-- [ ] Bot movement w/user mouse (user script not complete)
-- [ ] Userscript
-- [ ] Socket.io Server for human user connects
+- [x] Bot follows mouse movement
+- [x] Userscript
+- [x] Socket.io Server for userscript communications
+
+# To Do
+- [ ] Name packet
+- [ ] Respawn when dying
+- [ ] Chat spam
+- [ ] Multithreading
+- [ ] Collect pellets
+- [ ] Proxy support
