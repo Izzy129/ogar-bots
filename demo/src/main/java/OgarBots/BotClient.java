@@ -3,15 +3,10 @@ package OgarBots;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-
-import io.netty.channel.unix.Buffer;
-import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 
 public class BotClient extends WebSocketClient {
 	public static int botAmount = 0;
@@ -33,9 +28,9 @@ public class BotClient extends WebSocketClient {
 		if (isOpen()) { // send packet if connected
 			super.send(bytes);
 		} else {
-			try { // wait 500 ms and try again
+			try { // reconnect, wait timeout, and try again
+				System.out.println("[BotClient] Bot " + this.botId + " not connected! Reconnecting in " + sendTimeout +  " ms...");
 				super.reconnect();
-				System.out.println("Bot " + this.botId + " not connected! Waiting " + sendTimeout +  " ms...");
 				Thread.sleep(500); 
 				this.send(bytes);
 			} catch (Exception e) {
@@ -49,7 +44,7 @@ public class BotClient extends WebSocketClient {
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
-		System.out.println("Bot " + botId + " connected");
+		System.out.println("[BotClient] Bot " + botId + " connected");
 
 		// got these from badplayer55's onCellcraft
 		send(new byte[] {
@@ -93,21 +88,21 @@ public class BotClient extends WebSocketClient {
 	public void onClose(int code, String reason, boolean remote) {
 		switch (code) {
 			case 1000:
-				System.out.println("Bot " + botId + " was kicked; Reason: " + reason);
+				System.out.println("[BotClient] Bot " + botId + " was kicked; Reason: " + reason);
 				break;
 			case 1006:
-				System.out.println("Server shut down");
+				System.out.println("[BotClient] Server shut down");
 				break;
 			default:
-				System.out.println("Unknown disconnect, code: " + code);
-				System.out.println("Reason: " + reason);
+				System.out.println("[BotClient] Unknown disconnect, code: " + code);
+				System.out.println("[BotClient] Reason: " + reason);
 				break;
 		}
 	}
 
 	@Override
 	public void onMessage(String message) {
-		System.out.println("received message: " + message);
+		System.out.println("[BotClient] received message: " + message);
 	}
 	@Override
 	public void onMessage(ByteBuffer buffer) {
@@ -161,6 +156,6 @@ public class BotClient extends WebSocketClient {
 
 	@Override
 	public void onError(Exception ex) {
-		System.err.println("an error occurred:" + ex);
+		System.err.println("[BotClient] an error occurred:" + ex);
 	}
 }
