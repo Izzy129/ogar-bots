@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class App {
     public static String targetIp = ""; // from userscript
     public static String origin = ""; // from userscript
-    public static int botCount = 100;
+    public static int botCount = 25;
     public static int connectTimeout = 0; // add later when multithreading and proxies used
     public static ArrayList<BotClient> bots = new ArrayList<BotClient>();
 
@@ -26,7 +26,6 @@ public class App {
         Matcher matcher = pattern.matcher(ip);
 
         if (matcher.find()) {
-            System.out.println(matcher.group(1));
             return matcher.group(1);
         } else {
             return "localhost";
@@ -51,7 +50,7 @@ public class App {
             BotClient c = new BotClient(new URI(targetIp), httpHeaders);
             bots.add(c);
             c.connect();
-
+            System.out.println("Bot " + c.botId + " spawned");   
             // sleep for connectTimeout
             try {
                 Thread.sleep(connectTimeout);
@@ -59,6 +58,13 @@ public class App {
                 e.printStackTrace();
             }
         }
+        // while (true) {
+        //     for (BotClient b:bots) {
+        //         b.sendPlay("1234"); // name dont work, just sends chinese character
+                
+        //     }
+        //     Thread.sleep(3000);
+        // }
     }
 
     // for now, single threaded works fine but look into multithreading later
