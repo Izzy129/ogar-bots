@@ -11,10 +11,10 @@ import java.util.regex.Pattern;
 public class App {
     public static String targetIp = ""; // from userscript
     public static String origin = ""; // from userscript
-    public static int botCount = 25;
+    public static int botCount = 4;
     public static int connectTimeout = 0; // add later when multithreading and proxies used
     public static ArrayList<BotClient> bots = new ArrayList<BotClient>();
-
+    public static int botsConnected = 0;
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Welcome to OgarBots");
         Server.start();
@@ -51,6 +51,7 @@ public class App {
             bots.add(c);
             c.connect();
             System.out.println("Bot " + c.botId + " spawned");   
+            botsConnected++;
             // sleep for connectTimeout
             try {
                 Thread.sleep(connectTimeout);
