@@ -24,22 +24,44 @@ console.log("ogarbot script loaded");
             origin: null
         };
         document.addEventListener('keydown', function (e) {
-            var key = e.keyCode || e.which; // deprecated, look into replacement
-            switch (key) {
-                case 69:
-                    socket.emit('split');
-                    console.log("split press");
-                    break;
-                case 82:
-                    socket.emit('eject');
-                    console.log("eject press");
-                    break;
-                case 67:
-                    var msg = prompt("What do you want to spam?", "I'm not a bot");
-                    socket.emit('spam', msg);
-                    console.log("spam press with message: " + msg);
-                    break;
-            }
+            setTimeout(function () {
+                var key = e.keyCode || e.which; // deprecated, look into replacement
+                switch (key) {
+                    case 69:
+                        socket.emit('splitDown');
+                        console.log("split Down");
+                        break;
+                    case 82:
+                        socket.emit('ejectDown');
+                        console.log("eject Down");
+                        break;
+                    case 67:
+                        var msg = prompt("What do you want to spam?", "I'm not a bot");
+                        socket.emit('spam', msg);
+                        console.log("spam press with message: " + msg);
+                        break;
+                }
+            }, 250);
+        });
+        document.addEventListener('keyup', function (e) {
+            setTimeout(function () {
+                var key = e.keyCode || e.which; // deprecated, look into replacement
+                switch (key) {
+                    case 69:
+                        socket.emit('splitUp');
+                        console.log("split Up");
+                        break;
+                    case 82:
+                        socket.emit('ejectUp');
+                        console.log("eject Up");
+                        break;
+                    case 67:
+                        var msg = prompt("What do you want to spam?", "I'm not a bot");
+                        socket.emit('spam', msg);
+                        console.log("spam press with message: " + msg);
+                        break;
+                }
+            }, 250);
         });
         // new code here
         WebSocket.prototype._send = WebSocket.prototype.send;
@@ -87,7 +109,7 @@ console.log("ogarbot script loaded");
             $('#mouseGuiX').html(window.user.x);
             $('#mouseGuiY').html(window.user.y);
         }, 100);
-        setInterval(function() {
+        setInterval(function () {
             socket.emit('requestCount');
 
         }, 2000);

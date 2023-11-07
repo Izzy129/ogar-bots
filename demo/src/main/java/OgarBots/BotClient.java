@@ -5,6 +5,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -15,23 +18,24 @@ public class BotClient extends WebSocketClient {
 	public boolean isAlive;
 	public int sendTimeout = 500; // 500 ms
 
-	
 	public Map<String, String> httpHeaders = new HashMap<String, String>();
 
 	public BotClient(URI serverURI, Map<String, String> httpHeaders) {
 		super(serverURI, httpHeaders);
 		botId = ++botAmount;
-		isAlive=false;
+		isAlive = false;
 	}
+
 	@Override
 	public void send(byte[] bytes) {
 		if (isOpen()) { // send packet if connected
 			super.send(bytes);
 		} else {
 			try { // reconnect, wait timeout, and try again
-				System.out.println("[BotClient] Bot " + this.botId + " not connected! Reconnecting in " + sendTimeout +  " ms...");
+				System.out.println(
+						"[BotClient] Bot " + this.botId + " not connected! Reconnecting in " + sendTimeout + " ms...");
 				super.reconnect();
-				Thread.sleep(500); 
+				Thread.sleep(500);
 				this.send(bytes);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -40,7 +44,6 @@ public class BotClient extends WebSocketClient {
 
 		// System.out.println("Sent bytes: " + Arrays.toString(bytes));
 	}
-	
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
@@ -61,6 +64,27 @@ public class BotClient extends WebSocketClient {
 		// send spawn request
 		sendPlay("testing"); // name dont work, just sends chinese character
 
+		Timer mouseEvent = new Timer();
+		mouseEvent.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				sendMouse(App.mouseX, App.mouseY);
+			}
+
+		}, 0, 1);
+		Timer checkEvent = new Timer();
+
+		checkEvent.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (App.doEject) {
+					sendEject();
+				}
+				if (App.doSplit) {
+					sendSplit();
+				}
+			}
+		}, 0, 50);
 
 	}
 
@@ -104,12 +128,13 @@ public class BotClient extends WebSocketClient {
 	public void onMessage(String message) {
 		System.out.println("[BotClient] received message: " + message);
 	}
+
 	@Override
 	public void onMessage(ByteBuffer buffer) {
-		// System.out.println("Received buffer RAW:  " + Arrays.toString(buffer.array())); // or .array()?
-		// System.out.println("Received buffer STRING: " + buffer.toString()); 
+		// System.out.println("Received buffer RAW: " +
+		// Arrays.toString(buffer.array())); // or .array()?
+		// System.out.println("Received buffer STRING: " + buffer.toString());
 	}
-
 
 	public void sendPlay(String name) {
 		// sooo apparently cigar unescapes this using encodeURIComponent, idk if you can
@@ -138,7 +163,6 @@ public class BotClient extends WebSocketClient {
 		}
 		// buffer.putInt(9,0);
 		send(buffer.array());
-
 
 	}
 

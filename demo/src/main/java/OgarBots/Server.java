@@ -11,14 +11,13 @@ public class Server { // this file is for user info from userscript
 
     public static void start() throws InterruptedException {
         Configuration config = new Configuration();
-        config.setHostname("localhost"); 
+        config.setHostname("localhost");
         config.setPort(8080); // port to listen on
 
         System.out.println("[Server] Socket.IO Server starting at port " + config.getPort() + "...");
-        
 
         final SocketIOServer server = new SocketIOServer(config);
-        
+
         server.addConnectListener(new ConnectListener() { // when user connects
             @Override
             public void onConnect(SocketIOClient client) {
@@ -40,39 +39,56 @@ public class Server { // this file is for user info from userscript
                 System.out.println("[Server] Bots started!");
             }
         });
-        
+
         server.addEventListener("movement", MovementPacket.class, new DataListener<MovementPacket>() {
             @Override
             public void onData(SocketIOClient client, MovementPacket data, AckRequest ackSender) throws Exception {
-                int x = data.getX();
-                int y = data.getY();
-                App.moveBots(x, y);
+                App.mouseX = data.getX();
+                App.mouseY = data.getY();
             }
         });
-        server.addEventListener("eject", String.class, new DataListener<String>() {
+        server.addEventListener("ejectDown", String.class, new DataListener<String>() {
             @Override
             public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
-                App.ejectBots();
+                if (App.doEject == false) {
+                    App.doEject = true;
+                }
             }
         });
-        server.addEventListener("split", String.class, new DataListener<String>() {
+        server.addEventListener("ejectUp", String.class, new DataListener<String>() {
             @Override
             public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
-                App.splitBots();
+                App.doEject = false;
+            }
+        });
+
+        server.addEventListener("splitDown", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
+                if (App.doSplit == false) {
+                    App.doSplit = true;
+                }
+            }
+        });
+        server.addEventListener("splitUp", String.class, new DataListener<String>() {
+            @Override
+            public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
+                App.doSplit = false;
             }
         });
 
         // once multi threading is added, please just handle constant emits from here
-        // for now, we'll just get userscript to request every 2 seconds and return it back
+        // for now, we'll just get userscript to request every 2 seconds and return it
+        // back
         server.addEventListener("requestCount", Integer.class, new DataListener<Integer>() {
 
             @Override
             public void onData(SocketIOClient client, Integer data, AckRequest ackSender) throws Exception {
                 server.getBroadcastOperations().sendEvent("botCount", App.botsConnected);
             }
-            
+
         });
- 
+
         server.start();
         System.out.println("[Server] Socket.IO Server started at port " + config.getPort() + "!");
         System.out.println();
