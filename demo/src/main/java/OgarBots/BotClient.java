@@ -41,8 +41,6 @@ public class BotClient extends WebSocketClient {
 				e.printStackTrace();
 			}
 		}
-
-		// System.out.println("Sent bytes: " + Arrays.toString(bytes));
 	}
 
 	@Override
@@ -131,50 +129,37 @@ public class BotClient extends WebSocketClient {
 
 	@Override
 	public void onMessage(ByteBuffer buffer) {
+		// this should only be used for raw debugging
+
+
 		// System.out.println("Received buffer RAW: " +
 		// Arrays.toString(buffer.array())); // or .array()?
 		// System.out.println("Received buffer STRING: " + buffer.toString());
 	}
 
 	public void sendPlay(String name) {
-		// sooo apparently cigar unescapes this using encodeURIComponent, idk if you can
-		// do this in java
-		// also has their own method of setting strings or something, refer to
-		// setStringUTF8();
+		// future note: unescape doesnt do much in java, dw about it
+		// refer to setStringUTF8(); 
 		// in cigar's binaryWriter.js
-
-		// for now ill just take weird chinese name lol
-		// byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
-		// // System.out.println("nameBytes: " + Arrays.toString(nameBytes));
-		// ByteBuffer buffer = ByteBuffer.allocate(1 + nameBytes.length);
-		// buffer.put((byte) 0x00);
-		// buffer.put(nameBytes);
-		// buffer.flip();
-		// send(buffer);
-		// isAlive = true;
-
 		byte[] nameBytes = name.getBytes();
 		ByteBuffer buffer = ByteBuffer.allocate(1 + nameBytes.length);
-		// ByteBuffer buffer = ByteBuffer.allocate(1 + name.length());
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		buffer.put(0, (byte) 0);
 		for (int i = 1; i < name.length(); i++) {
 			buffer.put(i, (byte) name.charAt(i));
 		}
-		// buffer.putInt(9,0);
 		send(buffer.array());
-
+		isAlive = true;
 	}
 
-	public void sendMouse(int x, int y) { // WORKS NOW YAY
+	public void sendMouse(int x, int y) { // works
 
 		ByteBuffer buffer = ByteBuffer.allocate(13); // allocate 13 bytes for mouse packet
 		buffer.order(ByteOrder.LITTLE_ENDIAN); // cigar uses this for mouse packets, so I will too :troll:
-		buffer.put(0, (byte) 16); // first byte used for something
+		buffer.put(0, (byte) 16); // first byte used to indicate what type of packet this is to server
 		buffer.putInt(1, x); // putInt() puts 4 bytes, so we need to put 4 bytes at a time
-		buffer.putInt(5, y); // last putInt() used 4 bytes, so start now at 5
-		buffer.putInt(9, 0);
-
+		buffer.putInt(5, y); // last putInt() used 4 bytes, so start now at 5 (1+4)
+		buffer.putInt(9, 0); // last putInt() used 4 bytes, so start now at 9 (5+4)
 		send(buffer.array());
 	}
 
