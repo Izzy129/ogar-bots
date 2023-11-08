@@ -79,7 +79,7 @@ public class Server { // this file is for user info from userscript
 
         // once multi threading is added, please just handle constant emits from here
         // for now, we'll just get userscript to request every 2 seconds and return it
-        // back
+        
         server.addEventListener("requestCount", Integer.class, new DataListener<Integer>() {
 
             @Override
