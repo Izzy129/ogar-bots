@@ -129,6 +129,13 @@ public class BotClient extends WebSocketClient {
 
 	@Override
 	public void onMessage(ByteBuffer buffer) {
+		// multiogar sends a binary buffer (0x14) for clearOwnedCells
+		// we can use this as an indicator for bot death?
+		ByteBuffer deathBuffer = ByteBuffer.allocate(3) //3 sounds enough lol
+		deathBuffer.put((byte) 0x14);
+		if (deathBuffer.equals(buffer)) {
+			System.out.println("[BotClient] Received clearAllOwned packet");
+		} 
 		// this should only be used for raw debugging
 
 
