@@ -193,11 +193,3 @@ setTimeout(function () {
         $("#gui").draggable();
     });
 }, 3000);
-
-/*<div id='particles-js'style='box-shadow: 0px 0px 0px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 500px;height: 50%; top: 0px; left: 150px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;'>
-
-
-</div>
-<div style ='z-index:0; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 150px;height: 50%; top: 0px; left: 0px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;'>
-</div>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>*/

@@ -7,7 +7,8 @@ import java.util.concurrent.Executors;
 public class App {
     public static String targetIp = ""; // from userscript
     public static String origin = ""; // from userscript
-    public static int botCount = 20;
+    
+    public static int botCount = 4;
     public static int connectTimeout = 10; // add later when multithreading and proxies used
     public static ArrayList<BotThread> bots = new ArrayList<BotThread>();
     public static int botsConnected = 0;
@@ -37,5 +38,6 @@ public class App {
             }
 
         }
-       
+    }       
 }
+

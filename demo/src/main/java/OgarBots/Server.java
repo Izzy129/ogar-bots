@@ -50,7 +50,7 @@ public class Server { // this file is for user info from userscript
         server.addEventListener("ejectDown", String.class, new DataListener<String>() {
             @Override
             public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
-                if (App.doEject == false) {
+                if (!App.doEject) {
                     App.doEject = true;
                 }
             }
@@ -65,7 +65,7 @@ public class Server { // this file is for user info from userscript
         server.addEventListener("splitDown", String.class, new DataListener<String>() {
             @Override
             public void onData(SocketIOClient client, String data, AckRequest ackSender) throws Exception {
-                if (App.doSplit == false) {
+                if (!App.doSplit) {
                     App.doSplit = true;
                 }
             }
