@@ -1,9 +1,6 @@
 # Ogar Bots
-MultiOgar Bots in Java (incomplete)
-
-Trying to learn web sockets on Java 
-
-Only uploading here for coding on laptop
+[MultiOgarII](https://github.com/m-byte918/MultiOgarII/) Bots in Java (incomplete)
+Made them to learn web sockets on Java 
 
 # Dependencies (maven repo)
 [Java-WebSocket](https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket) for WebSocket implementation in Java
@@ -16,15 +13,15 @@ Only uploading here for coding on laptop
 - [x] Bots connecting to the server
 - [x] WebSocket message handling
 - [x] Spawn packet
-- [x] Split/Eject packet
 - [x] Bot follows mouse movement
 - [x] Userscript
 - [x] Socket.io Server for userscript communications
 
 # To Do
-- [ ] Name packet
-- [ ] Respawn when dying
+- [x] Name packet
+- [x] Respawn when dying
+- [ ] Split/Eject packet (still a bit buggy with multithreading)
 - [ ] Chat spam
-- [ ] Multithreading
+- [x] Multithreading
 - [ ] Collect pellets
 - [ ] Proxy support

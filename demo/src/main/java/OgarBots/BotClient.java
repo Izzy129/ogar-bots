@@ -3,8 +3,12 @@ package OgarBots;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -14,33 +18,32 @@ public class BotClient extends WebSocketClient {
 
 	public boolean isAlive;
 	public int sendTimeout = 500; // 500 ms
+	public int respawnTime = 5000;
 
-	
 	public Map<String, String> httpHeaders = new HashMap<String, String>();
 
 	public BotClient(URI serverURI, Map<String, String> httpHeaders) {
 		super(serverURI, httpHeaders);
 		botId = ++botAmount;
-		isAlive=false;
+		isAlive = false;
 	}
+
 	@Override
 	public void send(byte[] bytes) {
 		if (isOpen()) { // send packet if connected
 			super.send(bytes);
 		} else {
 			try { // reconnect, wait timeout, and try again
-				System.out.println("[BotClient] Bot " + this.botId + " not connected! Reconnecting in " + sendTimeout +  " ms...");
+				System.out.println(
+						"[BotClient] Bot " + this.botId + " not connected! Reconnecting in " + sendTimeout + " ms...");
 				super.reconnect();
-				Thread.sleep(500); 
+				Thread.sleep(500);
 				this.send(bytes);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
-		// System.out.println("Sent bytes: " + Arrays.toString(bytes));
 	}
-	
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
@@ -53,14 +56,50 @@ public class BotClient extends WebSocketClient {
 		send(new byte[] {
 				(byte) 255, 50, (byte) 137, 112, 79
 		});
-		/*
-		 * cigar sends these when joining
-		 * const SEND_254 = new Uint8Array([254, 6, 0, 0, 0]);
-		 * const SEND_255 = new Uint8Array([255, 1, 0, 0, 0]);
-		 */
-		// send spawn request
-		sendPlay("testing"); // name dont work, just sends chinese character
+		// send initial spawn request
+		sendPlay("life.");
 
+		Timer spawnCheck = new Timer();
+		spawnCheck.schedule(new TimerTask() {
+			/*
+			 * again, don't really know what this does, just got from badplayer's client
+			 * I'm assuming it's checking if this bot can spawn again?
+			 */
+			@Override
+			public void run() {
+				send(new byte[] { 90, 51, 24, 34, (byte) 131 });
+			}
+		}, 0, 1750);
+		Timer respawn = new Timer();
+		respawn.schedule(new TimerTask() {
+			/*
+			 * if the "previous check" passes, then a new bot will be sent (since it died)
+			 */
+			@Override
+			public void run() {
+				sendPlay("death.");
+			}
+		}, 0, respawnTime);
+		Timer mouseEvent = new Timer();
+		mouseEvent.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				sendMouse(App.mouseX, App.mouseY);
+			}
+
+		}, 0, 1);
+		Timer checkEvent = new Timer();
+		checkEvent.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (App.doEject) {
+					sendEject();
+				}
+				if (App.doSplit) {
+					sendSplit();
+				}
+			}
+		}, 0, 50);
 
 	}
 
@@ -104,53 +143,41 @@ public class BotClient extends WebSocketClient {
 	public void onMessage(String message) {
 		System.out.println("[BotClient] received message: " + message);
 	}
+
 	@Override
 	public void onMessage(ByteBuffer buffer) {
-		// System.out.println("Received buffer RAW:  " + Arrays.toString(buffer.array())); // or .array()?
-		// System.out.println("Received buffer STRING: " + buffer.toString()); 
-	}
 
+		// System.out.println("Received buffer RAW: " +
+		// Arrays.toString(buffer.array())); // or .array()?
+		// System.out.println("Received buffer STRING: " + buffer.toString());
+	}
 
 	public void sendPlay(String name) {
-		// sooo apparently cigar unescapes this using encodeURIComponent, idk if you can
-		// do this in java
-		// also has their own method of setting strings or something, refer to
-		// setStringUTF8();
-		// in cigar's binaryWriter.js
-
-		// for now ill just take weird chinese name lol
-		// byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
-		// // System.out.println("nameBytes: " + Arrays.toString(nameBytes));
-		// ByteBuffer buffer = ByteBuffer.allocate(1 + nameBytes.length);
-		// buffer.put((byte) 0x00);
-		// buffer.put(nameBytes);
-		// buffer.flip();
-		// send(buffer);
-		// isAlive = true;
-
-		byte[] nameBytes = name.getBytes();
-		ByteBuffer buffer = ByteBuffer.allocate(1 + nameBytes.length);
-		// ByteBuffer buffer = ByteBuffer.allocate(1 + name.length());
-		buffer.order(ByteOrder.LITTLE_ENDIAN);
-		buffer.put(0, (byte) 0);
-		for (int i = 1; i < name.length(); i++) {
-			buffer.put(i, (byte) name.charAt(i));
+		/*
+		 * name packet is a byte array with each character index surrounded by zeros
+		 * ex: sendPlay("test");
+		 * -> packet sent: {0,116,0,101,0,115,0,116,0}
+		 * got idea from another client, and this worked with multiogarII so we're
+		 * sticking to this
+		 */
+		char[] charArr = name.toCharArray();
+		byte[] namePacket = new byte[charArr.length * 2 + 1];
+		for (int i = 0; i < charArr.length; i++) {
+			namePacket[i * 2] = (byte) 0;
+			namePacket[i * 2 + 1] = (byte) charArr[i];
 		}
-		// buffer.putInt(9,0);
-		send(buffer.array());
-
-
+		namePacket[namePacket.length - 1] = (byte) 0; // trailing 0
+		send(namePacket);
 	}
 
-	public void sendMouse(int x, int y) { // WORKS NOW YAY
+	public void sendMouse(int x, int y) {
 
 		ByteBuffer buffer = ByteBuffer.allocate(13); // allocate 13 bytes for mouse packet
-		buffer.order(ByteOrder.LITTLE_ENDIAN); // cigar uses this for mouse packets, so I will too :troll:
-		buffer.put(0, (byte) 16); // first byte used for something
+		buffer.order(ByteOrder.LITTLE_ENDIAN); // cigar uses this for mouse packets, so I will too 
+		buffer.put(0, (byte) 16); // first byte used to indicate what type of packet this is to server
 		buffer.putInt(1, x); // putInt() puts 4 bytes, so we need to put 4 bytes at a time
-		buffer.putInt(5, y); // last putInt() used 4 bytes, so start now at 5
-		buffer.putInt(9, 0);
-
+		buffer.putInt(5, y); // last putInt() used 4 bytes, so start now at 5 (1+4)
+		buffer.putInt(9, 0); // last putInt() used 4 bytes, so start now at 9 (5+4)
 		send(buffer.array());
 	}
 

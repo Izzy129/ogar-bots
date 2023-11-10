@@ -21,25 +21,48 @@ console.log("ogarbot script loaded");
             x: 0,
             y: 0,
             ip: null,
-            origin: null
+            origin: null,
+            startedBots: false
         };
         document.addEventListener('keydown', function (e) {
-            var key = e.keyCode || e.which; // deprecated, look into replacement
-            switch (key) {
-                case 69:
-                    socket.emit('split');
-                    console.log("split press");
-                    break;
-                case 82:
-                    socket.emit('eject');
-                    console.log("eject press");
-                    break;
-                case 67:
-                    var msg = prompt("What do you want to spam?", "I'm not a bot");
-                    socket.emit('spam', msg);
-                    console.log("spam press with message: " + msg);
-                    break;
-            }
+            setTimeout(function () {
+                var key = e.keyCode || e.which; // deprecated, look into replacement
+                switch (key) {
+                    case 69:
+                        socket.emit('splitDown');
+                        console.log("split Down");
+                        break;
+                    case 82:
+                        socket.emit('ejectDown');
+                        console.log("eject Down");
+                        break;
+                    case 67:
+                        var msg = prompt("What do you want to spam?", "I'm not a bot");
+                        socket.emit('spam', msg);
+                        console.log("spam press with message: " + msg);
+                        break;
+                }
+            }, 250);
+        });
+        document.addEventListener('keyup', function (e) {
+            setTimeout(function () {
+                var key = e.keyCode || e.which; // deprecated, look into replacement
+                switch (key) {
+                    case 69:
+                        socket.emit('splitUp');
+                        console.log("split Up");
+                        break;
+                    case 82:
+                        socket.emit('ejectUp');
+                        console.log("eject Up");
+                        break;
+                    case 67:
+                        var msg = prompt("What do you want to spam?", "I'm not a bot");
+                        socket.emit('spam', msg);
+                        console.log("spam press with message: " + msg);
+                        break;
+                }
+            }, 250);
         });
         // new code here
         WebSocket.prototype._send = WebSocket.prototype.send;
@@ -87,7 +110,7 @@ console.log("ogarbot script loaded");
             $('#mouseGuiX').html(window.user.x);
             $('#mouseGuiY').html(window.user.y);
         }, 100);
-        setInterval(function() {
+        setInterval(function () {
             socket.emit('requestCount');
 
         }, 2000);
@@ -101,7 +124,9 @@ console.log("ogarbot script loaded");
         setTimeout(function () { //<div style='box-shadow: 0px 0px 20px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 205px; top: 300px; left: 10px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;border: 2px solid #0c31d4;'> <div style='color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1;font-size: 22px; filter:alpha(opacity=100); padding: 10px;'><a>Trap Client</a></div> <div style=' color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1; filter:alpha(opacity=100); padding: 10px;'><br>Minions: <a id='minionCount'>Offline</a> </div><button id='start-bots' style='display: block;border-radius: 5px;border: 2px solid #6495ED;background-color: #BCD2EE;height: 50px;width: 120px;margin: auto;text-align: center;'>StartBots </button><marquee>TrapKillo - Owner</marquee> </div>
             $("#canvas").after("<div  id = 'gui' style='box-shadow: 0px 0px 20px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 205px; top: 300px; left: 10px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;border: 2px solid #0c31d4; border-radius: 15px 50px;'> <div style='color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1;font-size: 22px; filter:alpha(opacity=100); padding: 10px;'><a id='Client_Name'>Agar infinity</a></div> <div style=' color:#ffffff; display: inline; -moz-opacity:1; -khtml-opacity: 1; opacity:1; filter:alpha(opacity=100); padding: 10px;'><br>Minions: <a id='minionCount'>Offline</a> <br>X: <a id='mouseGuiX'>0</a> Y: <a id='mouseGuiY'>0</a> <br> <button id='start-bots' style='display: block;border-radius: 5px;border: 2px solid #6495ED;background-color: #BCD2EE;height: 50px;width: 120px;margin: auto;text-align: center;'>StartBots </button></div></div> </div>");
             document.getElementById('start-bots').onclick = function () {
+                if (this.startedBots) return; // bots already started
                 window.start();
+                this.startedBots = true;
             };
         }, 2000);
         socket.on('botCount', function (count) {
@@ -168,11 +193,3 @@ setTimeout(function () {
         $("#gui").draggable();
     });
 }, 3000);
-
-/*<div id='particles-js'style='box-shadow: 0px 0px 0px black;z-index:9999999; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 500px;height: 50%; top: 0px; left: 150px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;'>
-
-
-</div>
-<div style ='z-index:0; background-color: #000000; -moz-opacity: 0.4; -khtml-opacity: 0.4; opacity: 0.7; zoom: 1; width: 150px;height: 50%; top: 0px; left: 0px; display: block; position: absolute; text-align: center; font-size: 15px; color: #ffffff; font-family: Ubuntu;'>
-</div>
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>*/
