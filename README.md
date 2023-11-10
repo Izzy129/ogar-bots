@@ -13,7 +13,6 @@ Made them to learn web sockets on Java
 - [x] Bots connecting to the server
 - [x] WebSocket message handling
 - [x] Spawn packet
-- [x] Split/Eject packet
 - [x] Bot follows mouse movement
 - [x] Userscript
 - [x] Socket.io Server for userscript communications
@@ -21,6 +20,7 @@ Made them to learn web sockets on Java
 # To Do
 - [x] Name packet
 - [x] Respawn when dying
+- [ ] Split/Eject packet (still a bit buggy with multithreading)
 - [ ] Chat spam
 - [x] Multithreading
 - [ ] Collect pellets
